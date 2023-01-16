@@ -4,6 +4,7 @@ import java.util.*
 import javax.persistence.*
 
 @Entity
+@Table(name = "user")
 class User(
 
     @Column(nullable = false)
@@ -15,9 +16,6 @@ class User(
     @Column(nullable = false)
     var password: String,
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    var id: UUID = UUID.randomUUID(),
-) {
-    fun user() = User(email = "example@park108.net", name = "Jongkil Park", password = "password")
-}
+    @Id @GeneratedValue
+    var id: UUID? = null,
+)
