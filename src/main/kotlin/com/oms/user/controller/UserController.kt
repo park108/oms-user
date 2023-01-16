@@ -54,7 +54,12 @@ class UserController(private val repository: UserRepository) {
     @GetMapping("/{id}/password/{password}")
     fun checkPassword(@PathVariable id: UUID, @PathVariable password: String) : ResponseEntity<Boolean> {
 
-        val user = repository.findByIdOrNull(id) ?: return notFound().build()
+        val user = repository.findByIdOrNull(id)
+
+        if(null == user) {
+            logger.debug("## User not found = $id")
+            return notFound().build()
+        }
 
         logger.debug("## User found = ${user.email}")
 
