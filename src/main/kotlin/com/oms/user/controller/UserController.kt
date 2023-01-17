@@ -101,4 +101,29 @@ class UserController(private val repository: UserRepository) {
             internalServerError().build()
         }
     }
+
+    @PutMapping("/{id}")
+    fun putUser(@PathVariable id: UUID, @RequestBody body: User): ResponseEntity<User> {
+
+        val user = repository.findByIdOrNull(id)
+
+        if(null == user) {
+            logger.debug("## User not found = $id")
+            return notFound().build()
+        }
+
+        // Change editable values
+        user.name = body.name
+
+        logger.debug("## Changed user id = ${user.id}")
+        logger.debug("## Changed user name = ${user.name}")
+
+        return try {
+            ok().body(repository.save(user))
+        }
+        catch (e: Exception) {
+            logger.error { e }
+            internalServerError().build()
+        }
+    }
 }

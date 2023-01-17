@@ -4,7 +4,9 @@ import java.util.*
 import javax.persistence.*
 
 @Entity
-@Table(name = "user")
+@Table(name = "user", indexes = [
+    Index(name = "idx__name", columnList = "email")
+])
 class User(
 
     @Column(nullable = false)
