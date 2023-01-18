@@ -11,7 +11,7 @@ class SecurityConfig : WebSecurityConfigurerAdapter() {
 
     override fun configure(http: HttpSecurity) {
         http.authorizeRequests()
-                .antMatchers("/h2", "/h2/**", "/", "/**", "/api", "/api/**")
+                .antMatchers("/h2-console/**", "/h2", "/h2/**", "/", "/**", "/api", "/api/**")
                 .access("permitAll")
                 .and()
                 .httpBasic()
@@ -19,5 +19,6 @@ class SecurityConfig : WebSecurityConfigurerAdapter() {
                 .cors()
                 .and()
                 .csrf().disable()
+                .headers().frameOptions().disable() // Set to use h2-console in browser
     }
 }

@@ -7,7 +7,7 @@ import javax.persistence.*
 @Table(name = "user", indexes = [
     Index(name = "idx__name", columnList = "email")
 ])
-class User(
+class User (
 
     @Column(nullable = false)
     var email: String,
@@ -18,6 +18,8 @@ class User(
     @Column(nullable = false)
     var password: String,
 
-    @Id @GeneratedValue
+    @Id
+    @GeneratedValue
     var id: UUID? = null,
-)
+) : BaseEntity() {
+}
