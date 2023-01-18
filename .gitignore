@@ -5,7 +5,5 @@
 .gradle
 build/
 gradle/*
-gradlew
-gradlew.bat
 
 build.gradle.kts
