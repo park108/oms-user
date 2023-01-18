@@ -115,10 +115,12 @@ class UserController(private val repository: UserRepository) {
         // Change editable values
         user.name = body.name
         user.email = body.email
+        user.changedBy = body.changedBy
 
-        logger.debug("## Changed user id    = ${user.id}")
-        logger.debug("## Changed user name  = ${user.name}")
-        logger.debug("## Changed user email = ${user.email}")
+        logger.debug("## User id    = ${user.id}")
+        logger.debug("## User name  = ${user.name}")
+        logger.debug("## Email = ${user.email}")
+        logger.debug("## Changed by = ${user.changedBy}")
 
         return try {
             ok().body(repository.save(user))
