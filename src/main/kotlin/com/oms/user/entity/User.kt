@@ -10,13 +10,13 @@ import javax.persistence.*
 class User (
 
     @Column(nullable = false)
-    var email: String,
+    var email: String? = null,
 
     @Column(nullable = false)
-    var name: String,
+    var name: String? = null,
 
     @Column(nullable = false)
-    var password: String,
+    var password: String? = null,
 
     @Id
     @GeneratedValue

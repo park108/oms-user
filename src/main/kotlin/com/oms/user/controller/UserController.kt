@@ -19,7 +19,7 @@ private val logger = KotlinLogging.logger {}
 @RequestMapping("/api")
 class UserController(private val repository: UserRepository) {
 
-    private fun hasUser(email: String) = repository.existsByEmail(email)
+    private fun hasUser(email: String?) = repository.existsByEmail(email)
 
     @GetMapping("/")
     fun getUsers() : ResponseEntity<Iterable<User>> {
@@ -132,7 +132,7 @@ class UserController(private val repository: UserRepository) {
     }
 
     @PutMapping("/{id}/password/{password}")
-    fun changePassword(@PathVariable id: UUID, @PathVariable password: String, @RequestBody body: User) : ResponseEntity<User> {
+    fun changePassword(@PathVariable id: UUID, @PathVariable password: String, @RequestBody body: Map<String, Any>) : ResponseEntity<User> {
 
         val currentUser = repository.findByIdOrNull(id)
 
@@ -151,8 +151,11 @@ class UserController(private val repository: UserRepository) {
             return notFound().build()
         }
 
-        val newPassword = encoder.encode(body.password)
-        currentUser.password = newPassword
+        val newPassword = body["password"] as String
+        val changedBy = body["changedBy"] as String
+
+        currentUser.password = encoder.encode(newPassword)
+        currentUser.changedBy = changedBy
 
         return try {
             ok().body(repository.save(currentUser))

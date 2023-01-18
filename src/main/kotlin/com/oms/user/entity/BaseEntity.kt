@@ -28,6 +28,6 @@ abstract class BaseEntity {
     var changedAt: LocalDateTime = LocalDateTime.MIN
 
     @LastModifiedBy
-    @Column(nullable = false, updatable = false)
+    @Column(nullable = false)
     var changedBy: String = ""
 }
