@@ -4,6 +4,5 @@
 
 .gradle
 build/
-gradle/*
 
 build.gradle.kts
