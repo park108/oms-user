@@ -130,4 +130,36 @@ class UserController(private val repository: UserRepository) {
             internalServerError().build()
         }
     }
+
+    @PutMapping("/{id}/password/{password}")
+    fun changePassword(@PathVariable id: UUID, @PathVariable password: String, @RequestBody body: User) : ResponseEntity<User> {
+
+        val currentUser = repository.findByIdOrNull(id)
+
+        if(null == currentUser) {
+            logger.debug("## User not found = $id")
+            return notFound().build()
+        }
+
+        logger.debug("## User found = ${currentUser.email}")
+
+        val encoder = BCryptPasswordEncoder()
+        val currentPasswordMatchResult = encoder.matches(password, currentUser.password)
+
+        if(!currentPasswordMatchResult) {
+            logger.debug("## Current password not matched")
+            return notFound().build()
+        }
+
+        val newPassword = encoder.encode(body.password)
+        currentUser.password = newPassword
+
+        return try {
+            ok().body(repository.save(currentUser))
+        }
+        catch (e: Exception) {
+            logger.error { e }
+            internalServerError().build()
+        }
+    }
 }
