@@ -11,10 +11,4 @@ LABEL maintainer="park108@gmail.com"
 EXPOSE 8082
 
 # Set entry point
-ENTRYPOINT ["java"
-    , "-Xmx400M"
-    , "-Djava.security.egd=file:/dev/./urandom"
-    , "-jar"
-    , "/app.jar"
-    , "--spring.profiles.active=docker"
-]
+ENTRYPOINT ["java", "-Xmx400M", "-Djava.security.egd=file:/dev/./urandom", "-jar", "/app.jar", "--spring.profiles.active=docker"]
