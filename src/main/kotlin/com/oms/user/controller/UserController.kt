@@ -14,7 +14,7 @@ import java.util.*
 
 private val logger = KotlinLogging.logger {}
 
-@CrossOrigin(origins = ["http://localhost:8080", "http://localhost:8081", "https://oms.park108.net"])
+@CrossOrigin(origins = ["http://localhost:8080", "http://localhost:8082", "https://oms.park108.net"])
 @RestController
 @RequestMapping("/api")
 class UserController(private val repository: UserRepository) {
@@ -43,35 +43,6 @@ class UserController(private val repository: UserRepository) {
             when(val user = repository.findByIdOrNull(id)) {
                 null -> notFound().build()
                 else -> ok(user)
-            }
-        }
-        catch(e: Exception) {
-            logger.error { e }
-            internalServerError().build()
-        }
-    }
-
-    @GetMapping("/{id}/password/{password}")
-    fun checkPassword(@PathVariable id: UUID, @PathVariable password: String) : ResponseEntity<Boolean> {
-
-        val user = repository.findByIdOrNull(id)
-
-        if(null == user) {
-            logger.debug("## User not found = $id")
-            return notFound().build()
-        }
-
-        logger.debug("## User found = ${user.email}")
-
-        val encoder = BCryptPasswordEncoder()
-        val matchResult = encoder.matches(password, user.password)
-
-        logger.debug("## Password match result = $matchResult")
-
-        return try {
-            when {
-                matchResult -> ok(true)
-                else -> notFound().build()
             }
         }
         catch(e: Exception) {
@@ -131,34 +102,62 @@ class UserController(private val repository: UserRepository) {
         }
     }
 
-    @PutMapping("/{id}/password/{password}")
-    fun changePassword(@PathVariable id: UUID, @PathVariable password: String, @RequestBody body: Map<String, Any>) : ResponseEntity<User> {
+    @PostMapping("/{id}/password")
+    fun checkPassword(@PathVariable id: UUID, @RequestBody body: Map<String, Any>) : ResponseEntity<Boolean> {
 
-        val currentUser = repository.findByIdOrNull(id)
+        val user = repository.findByIdOrNull(id)
 
-        if(null == currentUser) {
+        if(null == user) {
             logger.debug("## User not found = $id")
             return notFound().build()
         }
 
-        logger.debug("## User found = ${currentUser.email}")
+        logger.debug("## User found = ${user.email}")
 
+        val password = body["password"] as String
         val encoder = BCryptPasswordEncoder()
-        val currentPasswordMatchResult = encoder.matches(password, currentUser.password)
+        val matchResult = encoder.matches(password, user.password)
 
-        if(!currentPasswordMatchResult) {
+        logger.debug("## Password match result = $matchResult")
+
+        return try {
+            when {
+                matchResult -> ok(true)
+                else -> notFound().build()
+            }
+        }
+        catch(e: Exception) {
+            logger.error { e }
+            internalServerError().build()
+        }
+    }
+
+    @PutMapping("/{id}/password")
+    fun changePassword(@PathVariable id: UUID, @RequestBody body: Map<String, Any>) : ResponseEntity<User> {
+
+        val user = repository.findByIdOrNull(id)
+
+        if(null == user) {
+            logger.debug("## User not found = $id")
+            return notFound().build()
+        }
+
+        logger.debug("## User found = ${user.email}")
+
+        val currentPassword = body["currentPassword"] as String
+        val encoder = BCryptPasswordEncoder()
+        val isCurrentPasswordMatched = encoder.matches(currentPassword, user.password)
+
+        if(!isCurrentPasswordMatched) {
             logger.debug("## Current password not matched")
             return notFound().build()
         }
 
-        val newPassword = body["password"] as String
-        val changedBy = body["changedBy"] as String
-
-        currentUser.password = encoder.encode(newPassword)
-        currentUser.changedBy = changedBy
+        val newPassword = body["newPassword"] as String
+        user.password = encoder.encode(newPassword)
 
         return try {
-            ok().body(repository.save(currentUser))
+            ok().body(repository.save(user))
         }
         catch (e: Exception) {
             logger.error { e }
