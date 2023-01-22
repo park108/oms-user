@@ -26,4 +26,4 @@ logging:
     root: ERROR
     org.springframework.web: ERROR
     com.oms: DEBUG
-    org.hibernate.SQL: DEBUG
+    org.hibernate.SQL: ERROR

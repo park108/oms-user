@@ -21,8 +21,17 @@ class UserController(private val repository: UserRepository) {
 
     private fun hasUser(email: String?) = repository.existsByEmail(email)
 
+    private final fun logFunctionStart(methodName: String) {
+        logger.info("##################################################")
+        logger.info(methodName)
+        logger.info("##################################################")
+    }
+
     @GetMapping("/")
     fun getUsers() : ResponseEntity<Iterable<User>> {
+
+        logFunctionStart("getUsers")
+
         return try {
             val users = repository.findAll()
             when(users.none()) {
@@ -39,10 +48,19 @@ class UserController(private val repository: UserRepository) {
     @GetMapping("/{id}")
     fun getUser(@PathVariable id: UUID) : ResponseEntity<User> {
 
+        logFunctionStart("getUser")
+        logger.info("  user.id = $id")
+
         return try {
             when(val user = repository.findByIdOrNull(id)) {
-                null -> notFound().build()
-                else -> ok(user)
+                null -> {
+                    logger.info("  ## User NOT found")
+                    notFound().build()
+                }
+                else -> {
+                    logger.debug("  ## User found = ${user.email}")
+                    ok(user)
+                }
             }
         }
         catch(e: Exception) {
@@ -53,6 +71,10 @@ class UserController(private val repository: UserRepository) {
 
     @PostMapping("/")
     fun postUser(@RequestBody body: User): ResponseEntity<User> {
+
+        logFunctionStart("postUser")
+        logger.info("  user.email = $body.email")
+        logger.info("  user.name = $body.name")
 
         // Encrypt password
         val encoder = BCryptPasswordEncoder()
@@ -76,22 +98,24 @@ class UserController(private val repository: UserRepository) {
     @PutMapping("/{id}")
     fun putUser(@PathVariable id: UUID, @RequestBody body: User): ResponseEntity<User> {
 
+        logFunctionStart("putUser")
+        logger.info("  user.id = $id")
+        logger.info("  user.email = $body.email")
+        logger.info("  user.name = $body.name")
+
         val user = repository.findByIdOrNull(id)
 
-        if(null == user) {
-            logger.debug("## User not found = $id")
-            return notFound().build()
+        when(user) {
+            null -> {
+                logger.info("  ## User NOT found")
+                return notFound().build()
+            }
+            else -> logger.debug("  ## User found = ${user.email}")
         }
 
         // Change editable values
         user.name = body.name
         user.email = body.email
-        user.changedBy = body.changedBy
-
-        logger.debug("## User id    = ${user.id}")
-        logger.debug("## User name  = ${user.name}")
-        logger.debug("## Email = ${user.email}")
-        logger.debug("## Changed by = ${user.changedBy}")
 
         return try {
             ok().body(repository.save(user))
@@ -105,20 +129,27 @@ class UserController(private val repository: UserRepository) {
     @PostMapping("/{id}/password")
     fun checkPassword(@PathVariable id: UUID, @RequestBody body: Map<String, Any>) : ResponseEntity<Boolean> {
 
+        logFunctionStart("checkPassword")
+        logger.info("  user.id = $id")
+
         val user = repository.findByIdOrNull(id)
 
-        if(null == user) {
-            logger.debug("## User not found = $id")
-            return notFound().build()
+        when(user) {
+            null -> {
+                logger.info("  ## User NOT found")
+                return notFound().build()
+            }
+            else -> logger.debug("  ## User found = ${user.email}")
         }
-
-        logger.debug("## User found = ${user.email}")
 
         val password = body["password"] as String
         val encoder = BCryptPasswordEncoder()
         val matchResult = encoder.matches(password, user.password)
 
-        logger.debug("## Password match result = $matchResult")
+        when {
+            matchResult -> logger.debug("  ## Password matched")
+            else -> logger.debug("  ## Password NOT matched")
+        }
 
         return try {
             when {
@@ -135,26 +166,63 @@ class UserController(private val repository: UserRepository) {
     @PutMapping("/{id}/password")
     fun changePassword(@PathVariable id: UUID, @RequestBody body: Map<String, Any>) : ResponseEntity<User> {
 
+        logFunctionStart("changePassword")
+        logger.info("  user.id = $id")
+
         val user = repository.findByIdOrNull(id)
 
-        if(null == user) {
-            logger.debug("## User not found = $id")
-            return notFound().build()
+        when(user) {
+            null -> {
+                logger.info("  ## User NOT found")
+                return notFound().build()
+            }
+            else -> logger.debug("  ## User found = ${user.email}")
         }
-
-        logger.debug("## User found = ${user.email}")
 
         val currentPassword = body["currentPassword"] as String
         val encoder = BCryptPasswordEncoder()
         val isCurrentPasswordMatched = encoder.matches(currentPassword, user.password)
 
-        if(!isCurrentPasswordMatched) {
-            logger.debug("## Current password not matched")
-            return notFound().build()
+        when {
+            isCurrentPasswordMatched -> {
+                logger.debug("  ## Password matched")
+                return notFound().build()
+            }
+            else -> logger.debug("  ## Password NOT matched")
         }
 
         val newPassword = body["newPassword"] as String
         user.password = encoder.encode(newPassword)
+
+        return try {
+            ok().body(repository.save(user))
+        }
+        catch (e: Exception) {
+            logger.error { e }
+            internalServerError().build()
+        }
+    }
+
+    @PutMapping("/{id}/password/init")
+    fun initPassword(@PathVariable id: UUID, @RequestBody body: Map<String, Any>) : ResponseEntity<User> {
+
+        logFunctionStart("initPassword")
+        logger.info("  user.id = $id")
+
+        val user = repository.findByIdOrNull(id)
+
+        when(user) {
+            null -> {
+                logger.info("  ## User NOT found")
+                return notFound().build()
+            }
+            else -> logger.debug("  ## User found = ${user.email}")
+        }
+
+        val initPassword = body["initPassword"] as String
+        val encoder = BCryptPasswordEncoder()
+
+        user.password = encoder.encode(initPassword)
 
         return try {
             ok().body(repository.save(user))
