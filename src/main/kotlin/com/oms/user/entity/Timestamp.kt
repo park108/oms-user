@@ -13,7 +13,7 @@ import javax.persistence.MappedSuperclass
 
 @MappedSuperclass
 @EntityListeners(AuditingEntityListener::class)
-abstract class BaseEntity {
+abstract class Timestamp {
 
     @CreatedDate
     @Column(nullable = false, updatable = false)

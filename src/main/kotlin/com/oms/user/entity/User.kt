@@ -21,5 +21,5 @@ class User (
     @Id
     @GeneratedValue
     var id: UUID? = null,
-) : BaseEntity() {
+) : Timestamp() {
 }
