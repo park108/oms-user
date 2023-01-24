@@ -5,3 +5,11 @@
 
 # Rest API
 - Swagger를 통해 관리하고 있습니다.
+
+# References
+
+## Automated timestamping
+[Spring Data JPA Audit in Kotlin](https://kapentaz.github.io/jpa/kotlin/Spring-Data-JPA-Audit-in-Kotlin/#)
+
+## Password handling
+[Handling Passwords with Spring Boot and Spring Security](https://reflectoring.io/spring-security-password-handling/)
