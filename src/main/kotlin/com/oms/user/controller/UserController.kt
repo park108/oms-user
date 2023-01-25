@@ -2,6 +2,7 @@ package com.oms.user.controller
 
 import com.oms.user.entity.User
 import com.oms.user.repository.UserRepository
+import io.swagger.annotations.ApiOperation
 import mu.KotlinLogging
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.http.HttpStatus
@@ -28,6 +29,7 @@ class UserController(private val repository: UserRepository) {
     }
 
     @GetMapping("/")
+    @ApiOperation(value = "User 목록 조회")
     fun getUsers() : ResponseEntity<Iterable<User>> {
 
         logFunctionStart("getUsers")
@@ -46,6 +48,7 @@ class UserController(private val repository: UserRepository) {
     }
 
     @GetMapping("/{id}")
+    @ApiOperation(value = "User 상세 조회")
     fun getUser(@PathVariable id: UUID) : ResponseEntity<User> {
 
         logFunctionStart("getUser")
@@ -70,6 +73,7 @@ class UserController(private val repository: UserRepository) {
     }
 
     @PostMapping("/")
+    @ApiOperation(value = "User 생성")
     fun postUser(@RequestBody body: User): ResponseEntity<User> {
 
         logFunctionStart("postUser")
@@ -96,6 +100,7 @@ class UserController(private val repository: UserRepository) {
     }
 
     @PutMapping("/{id}")
+    @ApiOperation(value = "User 수정")
     fun putUser(@PathVariable id: UUID, @RequestBody body: User): ResponseEntity<User> {
 
         logFunctionStart("putUser")
@@ -127,6 +132,7 @@ class UserController(private val repository: UserRepository) {
     }
 
     @PostMapping("/{id}/password")
+    @ApiOperation(value = "패스워드 체크")
     fun checkPassword(@PathVariable id: UUID, @RequestBody body: Map<String, Any>) : ResponseEntity<Boolean> {
 
         logFunctionStart("checkPassword")
@@ -164,6 +170,7 @@ class UserController(private val repository: UserRepository) {
     }
 
     @PutMapping("/{id}/password")
+    @ApiOperation(value = "패스워드 변경")
     fun changePassword(@PathVariable id: UUID, @RequestBody body: Map<String, Any>) : ResponseEntity<User> {
 
         logFunctionStart("changePassword")
@@ -204,6 +211,7 @@ class UserController(private val repository: UserRepository) {
     }
 
     @PutMapping("/{id}/password/init")
+    @ApiOperation(value = "패스워드 초기화")
     fun initPassword(@PathVariable id: UUID, @RequestBody body: Map<String, Any>) : ResponseEntity<User> {
 
         logFunctionStart("initPassword")

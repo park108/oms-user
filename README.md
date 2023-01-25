@@ -3,10 +3,10 @@
 - OMS를 사용하는 사용자 정보(법인별 사용자, 관리자, 시스템 운영자) 정보를 관리합니다.
 - 패스워드 관리 기능을 포함합니다.
 
-# Rest API
-- Swagger를 통해 관리하고 있습니다.
-
 # References
+
+## API documentation
+[spring-boot/kotlin swagger 적용하기](https://cholol.tistory.com/578)
 
 ## Automated timestamping
 [Spring Data JPA Audit in Kotlin](https://kapentaz.github.io/jpa/kotlin/Spring-Data-JPA-Audit-in-Kotlin/#)
