@@ -1,5 +1,6 @@
 package com.oms.user.controller
 
+import com.oms.user.entity.Password
 import com.oms.user.entity.User
 import com.oms.user.repository.UserRepository
 import io.swagger.annotations.ApiOperation
@@ -133,7 +134,7 @@ class UserController(private val repository: UserRepository) {
 
     @PostMapping("/{id}/password")
     @ApiOperation(value = "패스워드 체크")
-    fun checkPassword(@PathVariable id: UUID, @RequestBody body: Map<String, Any>) : ResponseEntity<Boolean> {
+    fun checkPassword(@PathVariable id: UUID, @RequestBody body: Password) : ResponseEntity<Boolean> {
 
         logFunctionStart("checkPassword")
         logger.info("  user.id = $id")
@@ -148,9 +149,14 @@ class UserController(private val repository: UserRepository) {
             else -> logger.debug("  ## User found = ${user.email}")
         }
 
-        val password = body["password"] as String
+        val currentPassword = body.currentPassword
+        if(null == currentPassword || "" == currentPassword) {
+            logger.info("  ## currentPassword is required")
+            return notFound().build()
+        }
+
         val encoder = BCryptPasswordEncoder()
-        val matchResult = encoder.matches(password, user.password)
+        val matchResult = encoder.matches(currentPassword, user.password)
 
         when {
             matchResult -> logger.debug("  ## Password matched")
@@ -171,7 +177,7 @@ class UserController(private val repository: UserRepository) {
 
     @PutMapping("/{id}/password")
     @ApiOperation(value = "패스워드 변경")
-    fun changePassword(@PathVariable id: UUID, @RequestBody body: Map<String, Any>) : ResponseEntity<User> {
+    fun changePassword(@PathVariable id: UUID, @RequestBody body: Password) : ResponseEntity<User> {
 
         logFunctionStart("changePassword")
         logger.info("  user.id = $id")
@@ -186,19 +192,26 @@ class UserController(private val repository: UserRepository) {
             else -> logger.debug("  ## User found = ${user.email}")
         }
 
-        val currentPassword = body["currentPassword"] as String
+        val currentPassword = body.currentPassword
+        if(null == currentPassword || "" == currentPassword) {
+            logger.info("  ## currentPassword is required")
+            return notFound().build()
+        }
+
         val encoder = BCryptPasswordEncoder()
         val isCurrentPasswordMatched = encoder.matches(currentPassword, user.password)
 
-        when {
-            isCurrentPasswordMatched -> {
-                logger.debug("  ## Password matched")
-                return notFound().build()
-            }
-            else -> logger.debug("  ## Password NOT matched")
+        if(!isCurrentPasswordMatched) {
+            logger.debug("  ## Password NOT matched")
+            return notFound().build()
         }
 
-        val newPassword = body["newPassword"] as String
+        val newPassword = body.newPassword
+        if(null == newPassword || "" == newPassword) {
+            logger.info("  ## newPassword is required")
+            return notFound().build()
+        }
+
         user.password = encoder.encode(newPassword)
 
         return try {
@@ -212,7 +225,7 @@ class UserController(private val repository: UserRepository) {
 
     @PutMapping("/{id}/password/init")
     @ApiOperation(value = "패스워드 초기화")
-    fun initPassword(@PathVariable id: UUID, @RequestBody body: Map<String, Any>) : ResponseEntity<User> {
+    fun initPassword(@PathVariable id: UUID, @RequestBody body: Password) : ResponseEntity<User> {
 
         logFunctionStart("initPassword")
         logger.info("  user.id = $id")
@@ -227,7 +240,12 @@ class UserController(private val repository: UserRepository) {
             else -> logger.debug("  ## User found = ${user.email}")
         }
 
-        val initPassword = body["initPassword"] as String
+        val initPassword = body.initPassword
+        if(null == initPassword || "" == initPassword) {
+            logger.info("  ## initPassword is required")
+            return notFound().build()
+        }
+
         val encoder = BCryptPasswordEncoder()
 
         user.password = encoder.encode(initPassword)
