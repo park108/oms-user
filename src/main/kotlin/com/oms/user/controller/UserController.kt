@@ -11,7 +11,6 @@ import org.springframework.http.ResponseEntity
 import org.springframework.http.ResponseEntity.*
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.web.bind.annotation.*
-import java.net.URI
 import java.util.*
 
 private val logger = KotlinLogging.logger {}
@@ -89,8 +88,7 @@ class UserController(private val repository: UserRepository) {
             when {
                 hasUser(body.email) -> status(HttpStatus.CONFLICT).build()
                 else -> {
-                    repository.save(body)
-                    created(URI.create("/")).build()
+                    ok(repository.save(body))
                 }
             }
         }
