@@ -22,6 +22,8 @@ class UserController(private val repository: UserRepository) {
 
     private fun hasUser(email: String?) = repository.existsByEmail(email)
 
+    private val passwordEncoder = BCryptPasswordEncoder()
+
     private final fun logFunctionStart(methodName: String) {
         logger.info("##################################################")
         logger.info(methodName)
@@ -81,8 +83,7 @@ class UserController(private val repository: UserRepository) {
         logger.info("  user.name = $body.name")
 
         // Encrypt password
-        val encoder = BCryptPasswordEncoder()
-        body.password = encoder.encode(body.password)
+        body.password = passwordEncoder.encode(body.password)
 
         return try {
             when {
@@ -153,8 +154,7 @@ class UserController(private val repository: UserRepository) {
             return notFound().build()
         }
 
-        val encoder = BCryptPasswordEncoder()
-        val matchResult = encoder.matches(currentPassword, user.password)
+        val matchResult = passwordEncoder.matches(currentPassword, user.password)
 
         when {
             matchResult -> logger.debug("  ## Password matched")
@@ -196,8 +196,7 @@ class UserController(private val repository: UserRepository) {
             return notFound().build()
         }
 
-        val encoder = BCryptPasswordEncoder()
-        val isCurrentPasswordMatched = encoder.matches(currentPassword, user.password)
+        val isCurrentPasswordMatched = passwordEncoder.matches(currentPassword, user.password)
 
         if(!isCurrentPasswordMatched) {
             logger.debug("  ## Password NOT matched")
@@ -210,7 +209,7 @@ class UserController(private val repository: UserRepository) {
             return notFound().build()
         }
 
-        user.password = encoder.encode(newPassword)
+        user.password = passwordEncoder.encode(newPassword)
 
         return try {
             ok().body(repository.save(user))
@@ -244,9 +243,7 @@ class UserController(private val repository: UserRepository) {
             return notFound().build()
         }
 
-        val encoder = BCryptPasswordEncoder()
-
-        user.password = encoder.encode(initPassword)
+        user.password = passwordEncoder.encode(initPassword)
 
         return try {
             ok().body(repository.save(user))
