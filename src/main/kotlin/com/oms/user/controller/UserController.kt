@@ -210,6 +210,7 @@ class UserController(private val repository: UserRepository) {
         }
 
         user.password = passwordEncoder.encode(newPassword)
+        user.isPasswordChangeRequired = false
 
         return try {
             ok().body(repository.save(user))
@@ -244,6 +245,7 @@ class UserController(private val repository: UserRepository) {
         }
 
         user.password = passwordEncoder.encode(initPassword)
+        user.isPasswordChangeRequired = true
 
         return try {
             ok().body(repository.save(user))

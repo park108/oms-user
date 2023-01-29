@@ -18,6 +18,9 @@ class User (
     @Column(nullable = false)
     var password: String? = null,
 
+    @Column
+    var isPasswordChangeRequired: Boolean = false,
+
     @Id
     @GeneratedValue
     var id: UUID? = null,
