@@ -18,7 +18,7 @@ class AuditConfig : AuditorAware<String> {
         val req = RequestContextHolder.currentRequestAttributes() as ServletRequestAttributes
         val userId = req.request.getHeader("userId")
 
-        logger.info("## User id from request header = $userId")
+        logger.info("## User modifier ID from request header = $userId")
 
         return when(userId) {
             null -> Optional.of("anonymous")

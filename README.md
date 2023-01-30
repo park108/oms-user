@@ -6,10 +6,15 @@
 # References
 
 ## API documentation
-[spring-boot/kotlin swagger 적용하기](https://cholol.tistory.com/578)
+- [spring-boot/kotlin swagger 적용하기](https://cholol.tistory.com/578)
 
 ## Automated timestamping
-[Spring Data JPA Audit in Kotlin](https://kapentaz.github.io/jpa/kotlin/Spring-Data-JPA-Audit-in-Kotlin/#)
+- [Spring Data JPA Audit in Kotlin](https://kapentaz.github.io/jpa/kotlin/Spring-Data-JPA-Audit-in-Kotlin/#)
 
 ## Password handling
-[Handling Passwords with Spring Boot and Spring Security](https://reflectoring.io/spring-security-password-handling/)
+- [Handling Passwords with Spring Boot and Spring Security](https://reflectoring.io/spring-security-password-handling/)
+
+## Logging
+- [[Spring Boot] Request body, Response body 로깅 하는 법 (with 코틀린)
+](https://mopil.tistory.com/74)
+- [Spring, Kotlin - Interceptor](https://sinna94.tistory.com/entry/Spring-Kotlin-Interceptor)
