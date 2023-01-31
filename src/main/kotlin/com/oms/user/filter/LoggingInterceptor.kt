@@ -13,8 +13,9 @@ import javax.servlet.http.HttpServletResponse
 class LoggingInterceptor(
         val converter: PrettyConverter
 ) : HandlerInterceptor {
+
     companion object {
-        val logger: Logger = LoggerFactory.getLogger(this::class.java)
+        private val logger: Logger = LoggerFactory.getLogger(this::class.java)
     }
 
     override fun preHandle(request: HttpServletRequest, response: HttpServletResponse, handler: Any): Boolean {
@@ -45,19 +46,24 @@ class LoggingInterceptor(
     ) {
 
         val wrapResponse = response as ContentCachingResponseWrapper
-        val bodyContents = converter.convert(wrapResponse.contentAsByteArray)
+        val omsMessage = response.getHeader("oms-result-message")
 
-        if("null" == bodyContents) logger.info(
-                "[RESPONSE] Status = {}, {}"
-                , response.status
-                , response.getHeader("oms-result-message")
-        )
-        else logger.info(
-                "[RESPONSE] Status = {}, {}\n######## BODY ########\n{}"
-                , response.status
-                , response.getHeader("oms-result-message")
-                , bodyContents
-        )
+        if(null != omsMessage) {
+
+            val bodyContents = converter.convert(wrapResponse.contentAsByteArray)
+
+            if ("null" == bodyContents) logger.info(
+                    "[RESPONSE] Status = {}, {}"
+                    , wrapResponse.status
+                    , omsMessage
+            )
+            else logger.info(
+                    "[RESPONSE] Status = {}, {}\n######## BODY ########\n{}"
+                    , wrapResponse.status
+                    , omsMessage
+                    , bodyContents
+            )
+        }
 
         super.afterCompletion(request, response, handler, ex)
     }

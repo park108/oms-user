@@ -19,7 +19,9 @@ class UserController(private val repository: UserRepository) {
 
     private fun hasUser(email: String?) = repository.existsByEmail(email)
 
-    private val passwordEncoder = BCryptPasswordEncoder()
+    companion object {
+        private val passwordEncoder = BCryptPasswordEncoder()
+    }
 
     @GetMapping("/")
     @ApiOperation(value = "User 목록 조회")
