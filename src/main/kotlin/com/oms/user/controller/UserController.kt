@@ -40,7 +40,7 @@ class UserController(private val repository: UserRepository) {
         }
         catch(e: Exception) {
             internalServerError()
-                    .header("oms-result-message", "Exception thrown")
+                    .header("oms-result-message", e.message)
                     .build()
         }
     }
@@ -61,7 +61,7 @@ class UserController(private val repository: UserRepository) {
         }
         catch(e: Exception) {
             internalServerError()
-                    .header("oms-result-message", "Exception thrown")
+                    .header("oms-result-message", e.message)
                     .build()
         }
     }
@@ -85,7 +85,7 @@ class UserController(private val repository: UserRepository) {
         }
         catch(e: Exception) {
             internalServerError()
-                    .header("oms-result-message", "Exception thrown")
+                    .header("oms-result-message", e.message)
                     .build()
         }
     }
@@ -100,8 +100,8 @@ class UserController(private val repository: UserRepository) {
                         .build()
 
         // Change editable values
-        user.name = body.name
-        user.email = body.email
+        if(null != body.name) user.name = body.name
+        if(null != body.email) user.email = body.email
 
         return try {
             ok().header("oms-result-message", "User {$id} changed")
@@ -109,7 +109,7 @@ class UserController(private val repository: UserRepository) {
         }
         catch(e: Exception) {
             internalServerError()
-                    .header("oms-result-message", "Exception thrown")
+                    .header("oms-result-message", e.message)
                     .build()
         }
     }
@@ -172,7 +172,7 @@ class UserController(private val repository: UserRepository) {
         }
         catch(e: Exception) {
             internalServerError()
-                    .header("oms-result-message", "Exception thrown")
+                    .header("oms-result-message", e.message)
                     .build()
         }
     }
@@ -202,7 +202,7 @@ class UserController(private val repository: UserRepository) {
         }
         catch(e: Exception) {
             internalServerError()
-                    .header("oms-result-message", "Exception thrown")
+                    .header("oms-result-message", e.message)
                     .build()
         }
     }
