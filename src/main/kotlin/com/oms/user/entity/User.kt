@@ -31,5 +31,4 @@ class User (
     @GeneratedValue
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     var id: UUID? = null,
-) : Timestamp() {
-}
+) : Timestamp()
