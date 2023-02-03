@@ -4,6 +4,9 @@ import com.oms.user.entity.Password
 import com.oms.user.entity.User
 import com.oms.user.repository.UserRepository
 import io.swagger.annotations.ApiOperation
+import io.swagger.annotations.ApiParam
+import io.swagger.annotations.ApiResponse
+import io.swagger.annotations.ApiResponses
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
@@ -24,7 +27,11 @@ class UserController(private val repository: UserRepository) {
     }
 
     @GetMapping("/")
-    @ApiOperation(value = "User 목록 조회")
+    @ApiOperation(value = "Get user list", notes = "Return user list")
+    @ApiResponses(
+            ApiResponse(code = 404, message = "User not found"),
+            ApiResponse(code = 200, message = "Retrieve one or more users successfully")
+    )
     fun getUsers() : ResponseEntity<Iterable<User>> {
 
         return try {
@@ -46,8 +53,14 @@ class UserController(private val repository: UserRepository) {
     }
 
     @GetMapping("/{id}")
-    @ApiOperation(value = "User 상세 조회")
-    fun getUser(@PathVariable id: UUID) : ResponseEntity<User> {
+    @ApiOperation(value = "Get a user", notes = "Return a user")
+    @ApiResponses(
+            ApiResponse(code = 404, message = "User not found"),
+            ApiResponse(code = 200, message = "Retrieve a user successfully")
+    )
+    fun getUser(
+            @PathVariable @ApiParam(name = "id", value = "User ID", example = "3fa85f64-5717-4562-b3fc-2c963f66afa6") id: UUID
+    ) : ResponseEntity<User> {
 
         return try {
             when(val user = repository.findByIdOrNull(id)) {
@@ -67,8 +80,14 @@ class UserController(private val repository: UserRepository) {
     }
 
     @PostMapping("/")
-    @ApiOperation(value = "User 생성")
-    fun postUser(@RequestBody user: User): ResponseEntity<User> {
+    @ApiOperation(value = "Create a user", notes = "Insert a user")
+    @ApiResponses(
+            ApiResponse(code = 409, message = "User already exists"),
+            ApiResponse(code = 201, message = "Post a user successfully")
+    )
+    fun postUser(
+            @RequestBody user: User
+    ): ResponseEntity<User> {
 
         // Encrypt password
         user.password = passwordEncoder.encode(user.password)
@@ -91,8 +110,15 @@ class UserController(private val repository: UserRepository) {
     }
 
     @PutMapping("/{id}")
-    @ApiOperation(value = "User 수정")
-    fun putUser(@PathVariable id: UUID, @RequestBody body: User): ResponseEntity<User> {
+    @ApiOperation(value = "Change a user", notes = "Update a user")
+    @ApiResponses(
+            ApiResponse(code = 404, message = "User not found"),
+            ApiResponse(code = 200, message = "Put a user successfully")
+    )
+    fun putUser(
+            @PathVariable @ApiParam(name = "id", value = "User ID", example = "3fa85f64-5717-4562-b3fc-2c963f66afa6") id: UUID
+            , @RequestBody body: User
+    ): ResponseEntity<User> {
 
         val user = repository.findByIdOrNull(id)
                 ?: return notFound()
@@ -115,8 +141,17 @@ class UserController(private val repository: UserRepository) {
     }
 
     @PostMapping("/{id}/password")
-    @ApiOperation(value = "패스워드 체크")
-    fun checkPassword(@PathVariable id: UUID, @RequestBody body: Password) : ResponseEntity<Boolean> {
+    @ApiOperation(value = "Check user's password", notes = "Return currentPassword validation result")
+    @ApiResponses(
+            ApiResponse(code = 404, message = "User not found"),
+            ApiResponse(code = 400, message = "Password not entered"),
+            ApiResponse(code = 403, message = "Password not matched"),
+            ApiResponse(code = 200, message = "Password matched")
+    )
+    fun checkPassword(
+            @PathVariable @ApiParam(name = "id", value = "User ID", example = "3fa85f64-5717-4562-b3fc-2c963f66afa6") id: UUID
+            , @RequestBody body: Password
+    ) : ResponseEntity<Boolean> {
 
         val user = repository.findByIdOrNull(id)
                 ?: return notFound()
@@ -129,7 +164,7 @@ class UserController(private val repository: UserRepository) {
                         .build()
 
         return when(passwordEncoder.matches(currentPassword, user.password)) {
-            false -> notFound()
+            false -> status(HttpStatus.FORBIDDEN)
                     .header("oms-result-message", "currentPassword NOT matched")
                     .build()
             true -> ok()
@@ -139,8 +174,17 @@ class UserController(private val repository: UserRepository) {
     }
 
     @PutMapping("/{id}/password")
-    @ApiOperation(value = "패스워드 변경")
-    fun changePassword(@PathVariable id: UUID, @RequestBody body: Password) : ResponseEntity<User> {
+    @ApiOperation(value = "Change user's password", notes = "Check currentPassword and replace it newPassword")
+    @ApiResponses(
+            ApiResponse(code = 404, message = "User not found"),
+            ApiResponse(code = 400, message = "Current or new password not entered"),
+            ApiResponse(code = 403, message = "Current password not matched"),
+            ApiResponse(code = 200, message = "Password changed")
+    )
+    fun changePassword(
+            @PathVariable @ApiParam(name = "id", value = "User ID", example = "3fa85f64-5717-4562-b3fc-2c963f66afa6") id: UUID
+            , @RequestBody body: Password
+    ) : ResponseEntity<User> {
 
         val user = repository.findByIdOrNull(id)
                 ?: return notFound()
@@ -153,7 +197,7 @@ class UserController(private val repository: UserRepository) {
                     .build()
 
         val isCurrentPasswordMatched = passwordEncoder.matches(currentPassword, user.password)
-        if(!isCurrentPasswordMatched) return notFound()
+        if(!isCurrentPasswordMatched) return status(HttpStatus.FORBIDDEN)
                 .header("oms-result-message", "currentPassword NOT matched")
                 .build()
 
@@ -178,8 +222,16 @@ class UserController(private val repository: UserRepository) {
     }
 
     @PutMapping("/{id}/password/init")
-    @ApiOperation(value = "패스워드 초기화")
-    fun initPassword(@PathVariable id: UUID, @RequestBody body: Password) : ResponseEntity<User> {
+    @ApiOperation(value = "Initialize user's password", notes = "Change user's password with the initPassword")
+    @ApiResponses(
+            ApiResponse(code = 404, message = "User not found"),
+            ApiResponse(code = 400, message = "Initial password not entered"),
+            ApiResponse(code = 200, message = "Password initialized")
+    )
+    fun initPassword(
+            @PathVariable @ApiParam(name = "id", value = "User ID", example = "3fa85f64-5717-4562-b3fc-2c963f66afa6") id: UUID
+            , @RequestBody body: Password
+    ) : ResponseEntity<User> {
 
         val user = repository.findByIdOrNull(id)
                 ?: return notFound()
