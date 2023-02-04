@@ -144,9 +144,9 @@ class UserController(private val repository: UserRepository) {
     @ApiOperation(value = "Check user's password", notes = "Return currentPassword validation result")
     @ApiResponses(
             ApiResponse(code = 404, message = "User not found"),
-            ApiResponse(code = 400, message = "Password not entered"),
-            ApiResponse(code = 403, message = "Password not matched"),
-            ApiResponse(code = 200, message = "Password matched")
+            ApiResponse(code = 400, message = "currentPassword not entered"),
+            ApiResponse(code = 403, message = "currentPassword not matched"),
+            ApiResponse(code = 200, message = "currentPassword matched")
     )
     fun checkPassword(
             @PathVariable @ApiParam(name = "id", value = "User ID", example = "3fa85f64-5717-4562-b3fc-2c963f66afa6") id: UUID
@@ -177,9 +177,9 @@ class UserController(private val repository: UserRepository) {
     @ApiOperation(value = "Change user's password", notes = "Check currentPassword and replace it newPassword")
     @ApiResponses(
             ApiResponse(code = 404, message = "User not found"),
-            ApiResponse(code = 400, message = "Current or new password not entered"),
-            ApiResponse(code = 403, message = "Current password not matched"),
-            ApiResponse(code = 200, message = "Password changed")
+            ApiResponse(code = 400, message = "currentPassword or newPassword not entered"),
+            ApiResponse(code = 403, message = "currentPassword not matched"),
+            ApiResponse(code = 200, message = "currentPassword changed")
     )
     fun changePassword(
             @PathVariable @ApiParam(name = "id", value = "User ID", example = "3fa85f64-5717-4562-b3fc-2c963f66afa6") id: UUID
@@ -225,8 +225,8 @@ class UserController(private val repository: UserRepository) {
     @ApiOperation(value = "Initialize user's password", notes = "Change user's password with the initPassword")
     @ApiResponses(
             ApiResponse(code = 404, message = "User not found"),
-            ApiResponse(code = 400, message = "Initial password not entered"),
-            ApiResponse(code = 200, message = "Password initialized")
+            ApiResponse(code = 400, message = "initPassword not entered"),
+            ApiResponse(code = 200, message = "currentPassword initialized")
     )
     fun initPassword(
             @PathVariable @ApiParam(name = "id", value = "User ID", example = "3fa85f64-5717-4562-b3fc-2c963f66afa6") id: UUID
