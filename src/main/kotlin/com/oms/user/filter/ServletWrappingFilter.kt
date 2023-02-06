@@ -10,15 +10,15 @@ import javax.servlet.http.HttpServletResponse
 @Component
 class ServletWrappingFilter : OncePerRequestFilter() {
 
-    override fun doFilterInternal(
-        request: HttpServletRequest
-        , response: HttpServletResponse
-        , filterChain: FilterChain) {
+	override fun doFilterInternal(
+		request: HttpServletRequest
+		, response: HttpServletResponse
+		, filterChain: FilterChain) {
 
-        val wrapRequest = MultiAccessRequestWrapper(request)
-        val wrapResponse = ContentCachingResponseWrapper(response)
+		val wrapRequest = MultiAccessRequestWrapper(request)
+		val wrapResponse = ContentCachingResponseWrapper(response)
 
-        filterChain.doFilter(wrapRequest, wrapResponse)
-        wrapResponse.copyBodyToResponse()
-    }
+		filterChain.doFilter(wrapRequest, wrapResponse)
+		wrapResponse.copyBodyToResponse()
+	}
 }

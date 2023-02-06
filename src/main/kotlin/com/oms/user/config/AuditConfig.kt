@@ -12,17 +12,17 @@ private val logger = KotlinLogging.logger {}
 @Configuration
 class AuditConfig : AuditorAware<String> {
 
-    @Override
-    override fun getCurrentAuditor(): Optional<String> {
+	@Override
+	override fun getCurrentAuditor(): Optional<String> {
 
-        val req = RequestContextHolder.currentRequestAttributes() as ServletRequestAttributes
-        val userId = req.request.getHeader("userId")
+		val req = RequestContextHolder.currentRequestAttributes() as ServletRequestAttributes
+		val userId = req.request.getHeader("userId")
 
-        logger.info("## User modifier ID from request header = $userId")
+		logger.info("## User modifier ID from request header = $userId")
 
-        return when(userId) {
-            null -> Optional.of("anonymous")
-            else -> Optional.of(userId)
-        }
-    }
+		return when(userId) {
+			null -> Optional.of("anonymous")
+			else -> Optional.of(userId)
+		}
+	}
 }

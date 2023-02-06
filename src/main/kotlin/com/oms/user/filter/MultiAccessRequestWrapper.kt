@@ -10,22 +10,22 @@ import javax.servlet.http.HttpServletRequestWrapper
 
 class MultiAccessRequestWrapper(request: HttpServletRequest) : HttpServletRequestWrapper(request) {
 
-    private var contents = ByteArrayOutputStream()
+	private var contents = ByteArrayOutputStream()
 
-    override fun getInputStream(): ServletInputStream {
+	override fun getInputStream(): ServletInputStream {
 
-        IOUtils.copy(super.getInputStream(), contents)
+		IOUtils.copy(super.getInputStream(), contents)
 
-        return object : ServletInputStream() {
-            private var buffer = ByteArrayInputStream(contents.toByteArray())
-            override fun read(): Int = buffer.read()
-            override fun isFinished(): Boolean = buffer.available() == 0
-            override fun isReady(): Boolean = true
-            override fun setReadListener(listener: ReadListener?) {
-                throw java.lang.RuntimeException("Not implemented")
-            }
-        }
-    }
+		return object : ServletInputStream() {
+			private var buffer = ByteArrayInputStream(contents.toByteArray())
+			override fun read(): Int = buffer.read()
+			override fun isFinished(): Boolean = buffer.available() == 0
+			override fun isReady(): Boolean = true
+			override fun setReadListener(listener: ReadListener?) {
+				throw java.lang.RuntimeException("Not implemented")
+			}
+		}
+	}
 
-    fun getContents(): ByteArray = this.inputStream.readAllBytes()
+	fun getContents(): ByteArray = this.inputStream.readAllBytes()
 }
