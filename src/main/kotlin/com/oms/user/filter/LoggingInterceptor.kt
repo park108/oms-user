@@ -21,19 +21,18 @@ class LoggingInterceptor(
 	override fun preHandle(request: HttpServletRequest, response: HttpServletResponse, handler: Any): Boolean {
 
 		val wrapRequest = request as MultiAccessRequestWrapper
-		val bodyContents = converter.convert(wrapRequest.getContents())
 
-		if("null" == bodyContents) logger.info(
-			"[REQUEST] {} {}"
-			, request.method
-			, request.requestURL
-		)
-		else logger.info(
-			"[REQUEST] {} {}\n######## BODY ########\n{}"
-			, request.method
-			, request.requestURL
-			, bodyContents
-		)
+		if(null != request.contentType && "application/json" == request.contentType) {
+
+			val bodyContents = converter.convert(wrapRequest.getContents())
+
+			if ("null" == bodyContents) logger.info(
+				"[REQUEST] {} {}", request.method, request.requestURL
+			)
+			else logger.info(
+				"[REQUEST] {} {}\n######## BODY ########\n{}", request.method, request.requestURL, bodyContents
+			)
+		}
 
 		return super.preHandle(request, response, handler)
 	}

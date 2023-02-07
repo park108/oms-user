@@ -10,7 +10,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
 
-      # Download AWS Corretto 17 because Github actions not supported this JDK version
+      # Download AWS Corretto 17 because GitHub actions not supported this JDK version
       - name: Get latest Corretto URL
         id: get-latest-corretto-url
         run: >-
