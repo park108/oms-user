@@ -140,6 +140,32 @@ class UserController(private val repository: UserRepository) {
 		}
 	}
 
+	@DeleteMapping("/{id}")
+	@ApiOperation(value = "Delete a user", notes = "Delete a user")
+	@ApiResponses(
+		ApiResponse(code = 404, message = "User not found"),
+		ApiResponse(code = 200, message = "Delete a user successfully")
+	)
+	fun deleteUser(
+		@PathVariable @ApiParam(name = "id", value = "User ID", example = "3fa85f64-5717-4562-b3fc-2c963f66afa6") id: UUID
+	): ResponseEntity<User> {
+
+		val user = repository.findByIdOrNull(id)
+			?: return notFound()
+				.header("oms-result-message", "User NOT found")
+				.build()
+
+		return try {
+			repository.delete(user)
+			ok().header("oms-result-message", "User {$id} deleted").body(user)
+		}
+		catch(e: Exception) {
+			internalServerError()
+				.header("oms-result-message", e.message)
+				.build()
+		}
+	}
+
 	@PostMapping("/{id}/password")
 	@ApiOperation(value = "Check user's password", notes = "Return currentPassword validation result")
 	@ApiResponses(

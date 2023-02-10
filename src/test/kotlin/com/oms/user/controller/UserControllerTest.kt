@@ -32,6 +32,29 @@ class UserControllerTest(
     }
 
     @Test
+    fun `create and delete user` () {
+        val user = User()
+
+        user.email = "delete_soon@example.com"
+        user.name = "Delete Soon"
+        user.password = "1q2w3e"
+
+        val createResult = userController.postUser(user)
+        assertEquals("201 CREATED", createResult.statusCode.toString(), "Created")
+
+        val users = userController.getUsers()
+
+        users.body?.forEach {
+            if(user.email == it.email && user.name == it.name) {
+                assertNotNull(it)
+                val deleteResult = userController.deleteUser(it.id!!)
+                assertEquals("200 OK", deleteResult.statusCode.toString(), "Deleted")
+            }
+        }
+
+    }
+
+    @Test
     fun `create user but already exists`() {
         val user = User()
 
