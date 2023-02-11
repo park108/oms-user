@@ -23,7 +23,7 @@ class User (
 	@ApiModelProperty(notes = "User's password", example = "1q2w3e", required = true)
 	var password: String? = null,
 
-	@Column
+	@Column(nullable = false)
 	@ApiModelProperty(notes = "Is password change required?", example = false.toString())
 	var isPasswordChangeRequired: Boolean = false,
 

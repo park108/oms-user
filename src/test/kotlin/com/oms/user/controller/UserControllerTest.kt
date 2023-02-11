@@ -51,7 +51,6 @@ class UserControllerTest(
                 assertEquals("200 OK", deleteResult.statusCode.toString(), "Deleted")
             }
         }
-
     }
 
     @Test
