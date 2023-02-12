@@ -11,57 +11,84 @@ import kotlin.test.assertNotNull
 @SpringBootTest
 @Transactional
 class UserControllerTest(
-    @Autowired val userController: UserController
+	@Autowired val userController: UserController
 //    , @Autowired val userRepository: UserRepository
 ) {
 
-    @Test
-    fun `get users`() {
-        val result = userController.getUsers()
-        assertEquals("200 OK", result.statusCode.toString(), "OK")
-    }
+	@Test
+	fun `get users`() {
+		val result = userController.getUsers()
+		assertEquals("200 OK", result.statusCode.toString(), "OK")
+	}
 
-    @Test
-    fun `get user`() {
-        val result = userController.getUsers()
+	@Test
+	fun `get user`() {
+		val result = userController.getUsers()
 
-        result.body?.forEach {
-            val user = it.id?.let { it1 -> userController.getUser(it1) }
-            assertNotNull(user)
-        }
-    }
+		result.body?.forEach {
+			val user = it.id?.let { it1 -> userController.getUser(it1) }
+			assertNotNull(user)
+		}
+	}
 
-    @Test
-    fun `create and delete user` () {
-        val user = User()
+	@Test
+	fun `create, change and delete user` () {
 
-        user.email = "delete_soon@example.com"
-        user.name = "Delete Soon"
-        user.password = "1q2w3e"
+		// Create new user
+		val user = User()
 
-        val createResult = userController.postUser(user)
-        assertEquals("201 CREATED", createResult.statusCode.toString(), "Created")
+		user.email = "delete_soon@example.com"
+		user.name = "Delete Soon"
+		user.password = "1q2w3e"
 
-        val users = userController.getUsers()
+		val createResult = userController.postUser(user)
+		assertEquals("201 CREATED", createResult.statusCode.toString(), "Created")
 
-        users.body?.forEach {
-            if(user.email == it.email && user.name == it.name) {
-                assertNotNull(it)
-                val deleteResult = userController.deleteUser(it.id!!)
-                assertEquals("200 OK", deleteResult.statusCode.toString(), "Deleted")
-            }
-        }
-    }
+		// Get created user
+		val createdUser = userController.getUser(createResult.body?.id!!).body
+		assertNotNull(createdUser)
 
-    @Test
-    fun `create user but already exists`() {
-        val user = User()
+		// Change created user
+		val changedName = "Changed"
+		createdUser.name = changedName
 
-        user.email = "park108@gmail.com"
-        user.name = "Jongkil Park"
-        user.password = "1q2w3e"
+		val changedResult = userController.putUser(createdUser.id!!, createdUser)
+		assertEquals("200 OK", changedResult.statusCode.toString(), "Changed")
 
-        val result = userController.postUser(user)
-        assertEquals("409 CONFLICT", result.statusCode.toString(), "Conflict")
-    }
+		// Get changed user
+		val changedUser = userController.getUser(changedResult.body?.id!!).body
+		assertEquals(changedUser!!.name, changedName)
+
+		// Clean up - delete changed user
+		val deleteResult = userController.deleteUser(changedUser.id!!)
+		assertEquals("200 OK", deleteResult.statusCode.toString(), "Deleted")
+	}
+
+	@Test
+	fun `create user but already exists`() {
+
+		// Create new user
+		val user = User()
+
+		user.email = "origin@gmail.com"
+		user.name = "Origin"
+		user.password = "1q2w3e"
+
+		val createResult = userController.postUser(user)
+		assertEquals("201 CREATED", createResult.statusCode.toString(), "Created")
+
+		// Create duplicated user
+		val duplicatedUser = User()
+
+		duplicatedUser.email = "origin@gmail.com"
+		duplicatedUser.name = "email duplicated"
+		duplicatedUser.password = "1q2w3e4r"
+
+		val duplicateResult = userController.postUser(user)
+		assertEquals("409 CONFLICT", duplicateResult.statusCode.toString(), "Conflict")
+
+		// Clean up - delete original user
+		val deleteResult = userController.deleteUser(createResult.body?.id!!)
+		assertEquals("200 OK", deleteResult.statusCode.toString(), "Deleted")
+	}
 }
