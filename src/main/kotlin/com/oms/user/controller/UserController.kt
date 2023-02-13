@@ -15,7 +15,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.web.bind.annotation.*
 import java.util.*
 
-@CrossOrigin(origins = ["http://localhost:8080", "http://localhost:8082", "https://oms.park108.net"])
+@CrossOrigin(origins = ["http://localhost:8080", "https://oms.park108.net"])
 @RestController
 @RequestMapping("/api")
 class UserController(private val repository: UserRepository) {
