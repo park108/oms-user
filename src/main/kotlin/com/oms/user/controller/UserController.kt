@@ -36,11 +36,11 @@ class UserController(private val repository: UserRepository) {
 
 		return try {
 			val users = repository.findAll()
-			when(users.none()) {
-				true -> notFound()
+			when(users.count()) {
+				0 -> notFound()
 					.header("oms-result-message", "User NOT found")
 					.build()
-				false -> ok()
+				else -> ok()
 					.header("oms-result-message", "${users.count()} user(s) found")
 					.body(users)
 			}
@@ -89,17 +89,19 @@ class UserController(private val repository: UserRepository) {
 		@RequestBody user: User
 	): ResponseEntity<User> {
 
-		// Encrypt password
-		user.password = passwordEncoder.encode(user.password)
-
 		return try {
-			when {
-				hasUser(user.email) -> status(HttpStatus.CONFLICT)
+			if(hasUser(user.email)) {
+				status(HttpStatus.CONFLICT)
 					.header("oms-result-message", "User already exists")
 					.build()
-				else -> status(HttpStatus.CREATED)
+			}
+			else {
+				val savedUser = repository.save(user.apply {
+					password = passwordEncoder.encode(user.password)
+				})
+				status(HttpStatus.CREATED)
 					.header("oms-result-message", "User ${user.name} created")
-					.body(repository.save(user))
+					.body(savedUser)
 			}
 		}
 		catch(e: Exception) {
@@ -126,18 +128,14 @@ class UserController(private val repository: UserRepository) {
 				.build()
 
 		// Change editable values
-		if(null != body.name) user.name = body.name
-		if(null != body.email) user.email = body.email
+		user.apply {
+			name = body.name ?: name
+			email = body.email ?: email
+		}
 
-		return try {
-			ok().header("oms-result-message", "User {$id} changed")
-				.body(repository.save(user))
-		}
-		catch(e: Exception) {
-			internalServerError()
-				.header("oms-result-message", e.message)
-				.build()
-		}
+		return ok()
+			.header("oms-result-message", "User {$id} changed")
+			.body(repository.save(user))
 	}
 
 	@DeleteMapping("/{id}")
