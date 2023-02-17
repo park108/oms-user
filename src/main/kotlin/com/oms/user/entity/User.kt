@@ -9,27 +9,26 @@ import javax.persistence.*
 @Table(name = "user", indexes = [
 	Index(name = "idx__name", columnList = "email")
 ])
-class User (
+data class User(
+	@field: Column(nullable = false)
+	@field: ApiModelProperty(notes = "e-mail address", example = "park108@example.com", required = true)
+	var email: String,
 
-	@Column(nullable = false)
-	@ApiModelProperty(notes = "e-mail address", example = "park108@example.com", required = true)
-	var email: String? = null,
+	@field: Column(nullable = false)
+	@field: ApiModelProperty(notes = "User's name", example = "Jongkil Park", required = true)
+	var name: String,
 
-	@Column(nullable = false)
-	@ApiModelProperty(notes = "User's name", example = "Jongkil Park", required = true)
-	var name: String? = null,
+	@field: Column(nullable = false)
+	@field: ApiModelProperty(notes = "User's password", example = "1q2w3e", required = true)
+	var password: String,
 
-	@Column(nullable = false)
-	@ApiModelProperty(notes = "User's password", example = "1q2w3e", required = true)
-	var password: String? = null,
-
-	@Column(nullable = false)
-	@ApiModelProperty(notes = "Is password change required?", example = false.toString())
-	var isPasswordChangeRequired: Boolean = false,
+	@field: Column(nullable = false)
+	@field: ApiModelProperty(notes = "Is password change required?", example = "false")
+	var isPasswordChangeRequired: Boolean,
 
 	@Id
 	@GeneratedValue
-	@ApiModelProperty(notes = "User's ID, UUID type", example = "3fa85f64-5717-4562-b3fc-2c963f66afa6", required = true)
-	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
-	var id: UUID? = null,
+	@field: ApiModelProperty(notes = "User's ID, UUID type", example = "3fa85f64-5717-4562-b3fc-2c963f66afa6", required = true)
+	@field: JsonProperty(access = JsonProperty.Access.READ_ONLY)
+	val id: UUID? = null,
 ) : Timestamp()

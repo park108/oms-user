@@ -129,8 +129,8 @@ class UserController(private val repository: UserRepository) {
 
 		// Change editable values
 		user.apply {
-			name = body.name ?: name
-			email = body.email ?: email
+			name = body.name
+			email = body.email
 		}
 
 		return ok()
