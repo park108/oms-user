@@ -35,11 +35,12 @@ class UserControllerTest(
 	fun `create, change and delete user` () {
 
 		// Create new user
-		val user = User()
-
-		user.email = "delete_soon@example.com"
-		user.name = "Delete Soon"
-		user.password = "1q2w3e"
+		val user = User(
+			email = "delete_soon@example.com",
+			name = "Delete Soon",
+			password = "1q2w3e",
+			isPasswordChangeRequired = false
+		)
 
 		val createResult = userController.postUser(user)
 		assertEquals("201 CREATED", createResult.statusCode.toString(), "Created")
@@ -68,23 +69,25 @@ class UserControllerTest(
 	fun `create user but already exists`() {
 
 		// Create new user
-		val user = User()
-
-		user.email = "origin@gmail.com"
-		user.name = "Origin"
-		user.password = "1q2w3e"
+		val user = User(
+			email = "origin@gmail.com",
+			name = "Origin",
+			password = "1q2w3e",
+			isPasswordChangeRequired = false
+		)
 
 		val createResult = userController.postUser(user)
 		assertEquals("201 CREATED", createResult.statusCode.toString(), "Created")
 
 		// Create duplicated user
-		val duplicatedUser = User()
+		val duplicatedUser = User(
+			email = "origin@gmail.com",
+			name = "email duplicated",
+			password = "1q2w3e4r",
+			isPasswordChangeRequired = false,
+		)
 
-		duplicatedUser.email = "origin@gmail.com"
-		duplicatedUser.name = "email duplicated"
-		duplicatedUser.password = "1q2w3e4r"
-
-		val duplicateResult = userController.postUser(user)
+		val duplicateResult = userController.postUser(duplicatedUser)
 		assertEquals("409 CONFLICT", duplicateResult.statusCode.toString(), "Conflict")
 
 		// Clean up - delete original user
