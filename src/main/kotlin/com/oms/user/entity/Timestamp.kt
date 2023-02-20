@@ -12,6 +12,7 @@ import java.util.*
 import javax.persistence.Column
 import javax.persistence.EntityListeners
 import javax.persistence.MappedSuperclass
+import javax.persistence.Version
 
 @MappedSuperclass
 @EntityListeners(AuditingEntityListener::class)
@@ -40,4 +41,10 @@ abstract class Timestamp {
 	@ApiModelProperty(notes = "Who changed record, automatically set by JPA Audit", example = "park108@gmail.com")
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	var changedBy: String = ""
+
+	@Version
+	@Column(nullable = false)
+	@ApiModelProperty(notes = "Version number, automatically set by JPA Audit")
+	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
+	var version: Long = 0
 }
