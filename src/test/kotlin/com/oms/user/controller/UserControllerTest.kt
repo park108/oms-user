@@ -51,7 +51,9 @@ class UserControllerTest(
 
 		// Change created user
 		val changedName = "Changed"
-		createdUser.name = changedName
+		createdUser.apply {
+			changedName.also { name = it }
+		}
 
 		val changedResult = userController.putUser(createdUser.id!!, createdUser)
 		assertEquals("200 OK", changedResult.statusCode.toString(), "Changed")
